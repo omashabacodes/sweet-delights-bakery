@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sweet Delights • Cart</title>
 
-  <!-- Minimal styles so this works even if your external CSS is broken -->
+  <!-- Minimal styles so this page works even if external CSS/JS are cached or broken -->
   <style>
     :root{--pink:#f8c6d0;--cream:#fff7e6;--brown:#6b4226;--ink:#1f2937;}
     *{box-sizing:border-box} html,body{margin:0;padding:0}
@@ -16,7 +16,7 @@
     nav a{color:var(--ink);text-decoration:none;margin:0 .5rem;padding:.5rem .75rem;border-radius:.75rem}
     nav a:hover{background:var(--pink)}
     .badge{background:var(--brown);color:#fff;border-radius:999px;padding:.1rem .5rem;margin-left:.25rem;font-size:.75rem}
-    h1{margin:1rem 0;color:var(--brown)}
+    h1,h2{color:var(--brown);margin:.5rem 0}
     .stack{display:grid;gap:.75rem}
     .card{background:#fff;border:1px solid #eee;border-radius:1rem;padding:1rem;box-shadow:0 10px 20px rgba(0,0,0,.04)}
     .grid{display:grid;gap:1rem}
@@ -25,6 +25,8 @@
     .btn-secondary{background:#fff;border:1px solid #ddd}
     .help{color:#6b7280;font-size:.9rem}
     img.thumb{height:60px;width:80px;object-fit:cover;border-radius:.5rem}
+    details{margin-top:1rem}
+    pre{white-space:pre-wrap;background:#f9fafb;border:1px dashed #ddd;padding:.75rem;border-radius:.75rem}
   </style>
 </head>
 <body>
@@ -47,68 +49,39 @@
   <main class="container">
     <h1>Your Cart</h1>
 
-    <div id="cartContainer" class="stack"></div>
+    <div id="cartContainer" class="stack" aria-live="polite"></div>
 
     <section class="stack" aria-labelledby="customSummaryTitle" style="margin-top:1rem">
-      <h2 id="customSummaryTitle" style="margin:.25rem 0;color:var(--brown)">Custom Order (This Session)</h2>
+      <h2 id="customSummaryTitle">Custom Order (This Session)</h2>
       <div id="customSummary" class="card" aria-live="polite"></div>
     </section>
 
-    <!-- Optional helper for screenshots: add sample items quickly -->
-    <details style="margin-top:1rem">
+    <!-- Optional helper for quick screenshots -->
+    <details>
       <summary><strong>Need a quick demo?</strong> Add sample items (optional)</summary>
       <button class="btn-secondary" id="demoAdd">Add 2 sample items</button>
     </details>
+
+    <!-- Built-in Storage Debug so you can screenshot without DevTools -->
+    <section class="card" id="storageDebug" style="margin-top:1rem">
+      <h2>Storage Debug (for screenshots)</h2>
+      <div class="stack" style="margin-bottom:.5rem">
+        <button class="btn-secondary" id="showStorage">Show Storage</button>
+        <button class="btn-secondary" id="refreshStorage" style="display:none">Refresh Storage</button>
+      </div>
+      <pre id="storageDump" style="display:none"></pre>
+      <p class="help">Look for <code>sdb_cart_v1</code> in <strong>localStorage</strong>, and
+        <code>sdb_custom_order_v1</code> / <code>sdb_order_processed_v1</code> in <strong>sessionStorage</strong>.
+      </p>
+    </section>
   </main>
 
   <!-- Inline JS so this page works on its own -->
   <script>
-  // ---------- Demo product catalog (for price/name lookups) ----------
+  // ---------- Product catalog used for names/prices ----------
   const PRODUCTS = [
-    {id:"cookie-chip",       name:"Chocolate Chip Cookies (6)", price:5.00, img:"https://picsum.photos/seed/cookie1/400/300", alt:"Cookies"},
-    {id:"cake-redvelvet",    name:"Red Velvet Cake Slice",      price:4.00, img:"https://picsum.photos/seed/redvelvet/400/300", alt:"Red velvet cake slice"},
-    {id:"cupcake-chocolate", name:"Chocolate Cupcake",          price:3.75, img:"https://picsum.photos/seed/cupcake2/400/300", alt:"Chocolate cupcake"}
-  ];
-
-  // ---------- Utilities ----------
-  const $  = (s, r=document) => r.querySelector(s);
-  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
-  const fmt = new Intl.NumberFormat(undefined, { style:"currency", currency:"USD" });
-
-  // ---------- Storage keys ----------
-  const CART_KEY   = "sdb_cart_v1";            // localStorage
-  const CUSTOM_KEY = "sdb_custom_order_v1";    // sessionStorage
-  const ORDER_KEY  = "sdb_order_processed_v1"; // sessionStorage
-
-  // ---------- Cart helpers ----------
-  function getCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
-  function setCart(items){ localStorage.setItem(CART_KEY, JSON.stringify(items)); updateCartBadge(); }
-  function removeFromCart(id){ setCart(getCart().filter(i => i.id !== id)); }
-  function updateCartBadge(){ const b = $("#cartCount"); if(!b) return; b.textContent = getCart().reduce((n,i)=>n+i.qty,0); }
-
-  // ---------- Render Cart (ALWAYS shows summary + buttons) ----------
-  function renderCart(){
-    const host = $("#cartContainer"); if(!host) return;
-    const cart = getCart();
-    const list = document.createElement("div"); list.className = "stack";
-    let total = 0;
-
-    if(cart.length > 0){
-      cart.forEach(item => {
-        const p = PRODUCTS.find(x => x.id === item.id) || {name:item.id, price:0, img:"https://picsum.photos/seed/placeholder/400/300", alt:"Item"};
-        const line = p.price * item.qty; total += line;
-        const row = document.createElement("div");
-        row.className = "card";
-        row.innerHTML = `
-          <div class="grid" style="grid-template-columns:80px 1fr auto; align-items:center">
-            <img class="thumb" src="${p.img}" alt="${p.alt}">
-            <div>
-              <strong>${p.name}</strong><br>
-              Qty: ${item.qty} × ${fmt.format(p.price)}
-            </div>
-            <div style="text-align:right">
-              <div>${fmt.format(line)}</div>
-              <button type="button" class="btn-secondary" data-id="${item.id}" style="margin-top:.5rem">Remove</button>
-            </div>
-          </div>`;
-        row.querySelector("button").
+    {id:"cupcake-vanilla",   name:"Vanilla Cupcake",              price:3.50, img:"https://picsum.photos/seed/cupcake1/400/300", alt:"Vanilla cupcake with frosting"},
+    {id:"cupcake-chocolate", name:"Chocolate Cupcake",            price:3.75, img:"https://picsum.photos/seed/cupcake2/400/300", alt:"Chocolate cupcake with sprinkles"},
+    {id:"cookie-chip",       name:"Chocolate Chip Cookies (6)",   price:5.00, img:"https://picsum.photos/seed/cookie1/400/300", alt:"Cookies"},
+    {id:"cheesecake-mini",   name:"Mini Cheesecake",              price:4.25, img:"https://picsum.photos/seed/cheesecake/400/300", alt:"Mini cheesecake with berries"},
+    {id:"loaf-banana",
