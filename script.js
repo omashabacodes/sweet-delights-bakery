@@ -1,4 +1,6 @@
 // --- Product Catalog (basic demo data) ---
+// marks processed order for this tab/session
+const ORDER_KEY = "sdb_order_processed_v1";
 const PRODUCTS = [
   {id:"cupcake-vanilla", name:"Vanilla Cupcake", price:3.50, img:"https://picsum.photos/seed/cupcake1/400/300", alt:"Vanilla cupcake with frosting"},
   {id:"cupcake-chocolate", name:"Chocolate Cupcake", price:3.75, img:"https://picsum.photos/seed/cupcake2/400/300", alt:"Chocolate cupcake with sprinkles"},
