@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sweet Delights Bakery</title>
+  <meta name="description" content="Freshly baked happiness every day – cupcakes, cakes, and bread." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script defer src="script.js"></script>
+
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html" aria-label="Sweet Delights Bakery Home">
+      <span aria-hidden="true">🧁</span>
+      <span class="logo-text">Sweet Delights</span>
+    </a>
+
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="siteNav" aria-label="Toggle navigation">☰</button>
+
+    <nav id="siteNav" class="site-nav" aria-label="Primary">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="products.html" class="nav-link">Products</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="custom.html" class="nav-link">Custom Orders</a>
+      <a href="cart.html" class="nav-link cart-link">Cart <span id="cartCount" class="badge" aria-label="Items in cart">0</span></a>
+    </nav>
+  </div>
+</header>
+
+
+<main class="container">
+  <h1>About Us</h1>
+  <p>Sweet Delights Bakery is a family-owned shop crafting treats since 1998. We believe in real butter, real vanilla, and real smiles.</p>
+
+  <h2>Daily Specials</h2>
+  <table class="table" aria-describedby="specialsHelp">
+    <caption id="specialsHelp">Ask in-store for allergen information. Prices include tax.</caption>
+    <thead>
+      <tr>
+        <th scope="col">Day</th>
+        <th scope="col">Special</th>
+        <th scope="col">Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Monday</td><td>Red Velvet Cupcake</td><td>$3.50</td></tr>
+      <tr><td>Wednesday</td><td>Chocolate Chip Cookies (6)</td><td>$5.00</td></tr>
+      <tr><td>Friday</td><td>Mini Cheesecake</td><td>$4.25</td></tr>
+    </tbody>
+  </table>
+
+  <h2>We’d Love Your Feedback</h2>
+  <form id="feedbackForm" class="stack" novalidate>
+    <label for="fbName">Name</label>
+    <input id="fbName" name="name" required />
+
+    <label for="fbEmail">Email</label>
+    <input id="fbEmail" type="email" name="email" required />
+
+    <label for="fbMessage">Message</label>
+    <textarea id="fbMessage" name="message" rows="4" required></textarea>
+
+    <button type="submit">Send Feedback</button>
+    <div id="feedbackMsg" class="message" role="status" aria-live="polite"></div>
+  </form>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <section aria-labelledby="subscribeTitle" class="subscribe">
+      <h2 id="subscribeTitle">Subscribe for Sweet Deals</h2>
+      <form id="subscribeForm" class="subscribe-form" novalidate>
+        <label for="subscribeEmail" class="sr-only">Email</label>
+        <input id="subscribeEmail" type="email" name="email" placeholder="Enter your email" aria-describedby="subscribeHelp" required />
+        <button type="submit">Subscribe</button>
+        <p id="subscribeHelp" class="help">We’ll never share your email.</p>
+      </form>
+      <div id="subscribeMessage" class="message" role="status" aria-live="polite"></div>
+    </section>
+
+    <section aria-labelledby="contactTitle" class="contact">
+      <h2 id="contactTitle">Contact</h2>
+      <p>123 Cupcake Lane, Sweetville</p>
+      <p><a href="tel:+15551234567">+1 (555) 123-4567</a></p>
+      <p><a href="mailto:hello@sweetdelights.example">hello@sweetdelights.example</a></p>
+    </section>
+
+    <section aria-labelledby="hoursTitle" class="hours">
+      <h2 id="hoursTitle">Hours</h2>
+      <ul>
+        <li>Mon–Fri: 8am–6pm</li>
+        <li>Sat: 9am–5pm</li>
+        <li>Sun: Closed</li>
+      </ul>
+    </section>
+  </div>
+  <div class="container footnote">© 2025 Sweet Delights Bakery</div>
+</footer>
+
+</body>
+</html>

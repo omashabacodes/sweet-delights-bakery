@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sweet Delights Bakery</title>
+  <meta name="description" content="Freshly baked happiness every day – cupcakes, cakes, and bread." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script defer src="script.js"></script>
+
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html" aria-label="Sweet Delights Bakery Home">
+      <span aria-hidden="true">🧁</span>
+      <span class="logo-text">Sweet Delights</span>
+    </a>
+
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="siteNav" aria-label="Toggle navigation">☰</button>
+
+    <nav id="siteNav" class="site-nav" aria-label="Primary">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="products.html" class="nav-link">Products</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="custom.html" class="nav-link">Custom Orders</a>
+      <a href="cart.html" class="nav-link cart-link">Cart <span id="cartCount" class="badge" aria-label="Items in cart">0</span></a>
+    </nav>
+  </div>
+</header>
+
+
+<main class="container">
+  <h1>Custom Orders</h1>
+  <p>Create your perfect cake! Your selections are saved during this visit to make checkout easier.</p>
+
+  <form id="customOrderForm" class="grid two-col" novalidate>
+    <div class="field">
+      <label for="cakeSize">Cake Size</label>
+      <select id="cakeSize" name="size" required>
+        <option value="">Select size</option>
+        <option>6-inch (serves 6–8)</option>
+        <option>8-inch (serves 10–12)</option>
+        <option>10-inch (serves 16–20)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="cakeFlavor">Flavor</label>
+      <select id="cakeFlavor" name="flavor" required>
+        <option value="">Select flavor</option>
+        <option>Vanilla</option>
+        <option>Chocolate</option>
+        <option>Red Velvet</option>
+        <option>Lemon</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="frosting">Frosting</label>
+      <select id="frosting" name="frosting" required>
+        <option value="">Select frosting</option>
+        <option>Buttercream</option>
+        <option>Cream Cheese</option>
+        <option>Chocolate Ganache</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="pickupDate">Pickup Date</label>
+      <input id="pickupDate" type="date" name="pickupDate" required />
+    </div>
+
+    <div class="field full">
+      <label for="notes">Design Notes</label>
+      <textarea id="notes" name="notes" rows="4" placeholder="Color theme, writing on cake, decorations…" required></textarea>
+    </div>
+
+    <div class="field full">
+      <button type="submit">Save Custom Order</button>
+      <a class="btn-secondary" href="cart.html">Go to Cart</a>
+    </div>
+    <div id="customMsg" class="message" role="status" aria-live="polite"></div>
+  </form>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <section aria-labelledby="subscribeTitle" class="subscribe">
+      <h2 id="subscribeTitle">Subscribe for Sweet Deals</h2>
+      <form id="subscribeForm" class="subscribe-form" novalidate>
+        <label for="subscribeEmail" class="sr-only">Email</label>
+        <input id="subscribeEmail" type="email" name="email" placeholder="Enter your email" aria-describedby="subscribeHelp" required />
+        <button type="submit">Subscribe</button>
+        <p id="subscribeHelp" class="help">We’ll never share your email.</p>
+      </form>
+      <div id="subscribeMessage" class="message" role="status" aria-live="polite"></div>
+    </section>
+
+    <section aria-labelledby="contactTitle" class="contact">
+      <h2 id="contactTitle">Contact</h2>
+      <p>123 Cupcake Lane, Sweetville</p>
+      <p><a href="tel:+15551234567">+1 (555) 123-4567</a></p>
+      <p><a href="mailto:hello@sweetdelights.example">hello@sweetdelights.example</a></p>
+    </section>
+
+    <section aria-labelledby="hoursTitle" class="hours">
+      <h2 id="hoursTitle">Hours</h2>
+      <ul>
+        <li>Mon–Fri: 8am–6pm</li>
+        <li>Sat: 9am–5pm</li>
+        <li>Sun: Closed</li>
+      </ul>
+    </section>
+  </div>
+  <div class="container footnote">© 2025 Sweet Delights Bakery</div>
+</footer>
+
+</body>
+</html>
