@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sweet Delights • Cart</title>
+  <title>Sweet Delights • Cart (CART-DIAG v3)</title>
   <style>
     :root{--pink:#f8c6d0;--cream:#fff7e6;--brown:#6b4226;--ink:#1f2937;}
     *{box-sizing:border-box} html,body{margin:0;padding:0}
@@ -23,8 +23,7 @@
     .btn-secondary{background:#fff;border:1px solid #ddd}
     .help{color:#6b7280;font-size:.9rem}
     img.thumb{height:60px;width:80px;object-fit:cover;border-radius:.5rem}
-    pre{white-space:pre-wrap;background:#f9fafb;border:1px dashed #ddd;padding:.75rem;border-radius:.75rem}
-    .toolbar{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+    .diag{background:#ffedd5;color:#7c2d12;border:2px dashed #fb923c;padding:.6rem 1rem;border-radius:1rem;margin:1rem 0;font-weight:800;text-align:center}
   </style>
 </head>
 <body>
@@ -42,22 +41,10 @@
   </header>
 
   <main class="container">
+    <div class="diag">CART-DIAG v3 • If you don’t see this banner, your browser is showing an old page.</div>
+
     <h1>Your Cart</h1>
-
-    <!-- Handy buttons so you can fix/verify without DevTools -->
-    <div class="card">
-      <div class="toolbar">
-        <button id="forceAdd" class="btn">➕ Force add 2 sample items</button>
-        <button id="clearAll" class="btn-secondary">🧹 Clear cart</button>
-        <button id="showDump" class="btn-secondary">👀 Show storage</button>
-        <button id="refreshDump" class="btn-secondary" style="display:none">🔄 Refresh storage</button>
-      </div>
-      <pre id="dump" style="display:none"></pre>
-      <p class="help">Make sure you’re on the **Pages** site: <code>https://omashabacodes.github.io/sweet-delights-bakery/...</code>  
-      (Cart won’t match if you added items on a different domain.)</p>
-    </div>
-
-    <div id="cartContainer" class="stack" aria-live="polite" style="margin-top:1rem"></div>
+    <div id="cartContainer" class="stack" aria-live="polite"></div>
 
     <section class="stack" aria-labelledby="customSummaryTitle" style="margin-top:1rem">
       <h2 id="customSummaryTitle">Custom Order (This Session)</h2>
@@ -69,57 +56,103 @@
       <div class="stack">
         <button id="processOrder" class="btn">Process Order</button>
         <button id="clearCart" class="btn-secondary">Clear Cart</button>
-        <p class="help">First click = success. Second click (same tab) = “already processed”.</p>
+        <p class="help">First click = success.• Second click (same tab) = “already processed”.</p>
       </div>
     </section>
   </main>
 
   <script>
-  // ---------- Catalog (for names/prices) ----------
+  // ——— Catalog ———
   const PRODUCTS = [
-    {id:"cupcake-vanilla",   name:"Vanilla Cupcake",            price:3.50, img:"https://picsum.photos/seed/cupcake1/400/300", alt:"Vanilla cupcake"},
-    {id:"cupcake-chocolate", name:"Chocolate Cupcake",          price:3.75, img:"https://picsum.photos/seed/cupcake2/400/300", alt:"Chocolate cupcake"},
-    {id:"cookie-chip",       name:"Chocolate Chip Cookies (6)", price:5.00, img:"https://picsum.photos/seed/cookie1/400/300",  alt:"Cookies"},
-    {id:"cheesecake-mini",   name:"Mini Cheesecake",            price:4.25, img:"https://picsum.photos/seed/cheesecake/400/300", alt:"Cheesecake"},
-    {id:"loaf-banana",       name:"Banana Bread Loaf",          price:6.50, img:"https://picsum.photos/seed/bananabread/400/300", alt:"Banana bread"},
-    {id:"cake-redvelvet",    name:"Red Velvet Cake Slice",      price:4.00, img:"https://picsum.photos/seed/redvelvet/400/300", alt:"Red velvet cake slice"}
+    {id:"cookie-chip",    name:"Chocolate Chip Cookies (6)", price:5.00, img:"https://picsum.photos/seed/cookie1/400/300", alt:"Cookies"},
+    {id:"cake-redvelvet", name:"Red Velvet Cake Slice",      price:4.00, img:"https://picsum.photos/seed/redvelvet/400/300", alt:"Red velvet"}
   ];
-
-  // ---------- Utils ----------
   const $ = (s,r=document)=>r.querySelector(s);
   const fmt = new Intl.NumberFormat(undefined,{style:"currency",currency:"USD"});
 
-  // ---------- Keys ----------
-  const CART_KEY="sdb_cart_v1";                   // localStorage
-  const CUSTOM_KEY="sdb_custom_order_v1";         // sessionStorage
-  const ORDER_KEY="sdb_order_processed_v1";       // sessionStorage
+  // ——— Keys ———
+  const CART_KEY="sdb_cart_v1"; const CUSTOM_KEY="sdb_custom_order_v1"; const ORDER_KEY="sdb_order_processed_v1";
   const FALLBACK_CART_KEYS=["cartItems","cart","myCart","items","shoppingCart","basket"];
 
-  // ---------- Cart helpers ----------
-  function normalize(arr){ if(!Array.isArray(arr)) return []; return arr.map(x=>{
-    const id = x.id || x.productId || x.name || ""; let qty=Number(x.qty ?? x.quantity ?? 1);
-    if(!Number.isFinite(qty)||qty<1) qty=1; return {id,qty};
-  }).filter(i=>i.id && typeof i.id==="string"); }
-
-  function readCartAny(){
-    try{ const v=localStorage.getItem(CART_KEY); if(v) return normalize(JSON.parse(v)); }catch{}
-    for(const k of FALLBACK_CART_KEYS){ try{ const v=localStorage.getItem(k); if(v) return normalize(JSON.parse(v)); }catch{} }
+  // ——— Cart helpers ———
+  const normalize=a=>Array.isArray(a)?a.map(x=>({id:(x.id||x.productId||x.name||"").toString(),qty:Math.max(1,Number(x.qty??x.quantity??1)||1)})).filter(i=>i.id):[];
+  function readCart(){
+    try{const v=localStorage.getItem(CART_KEY); if(v) return normalize(JSON.parse(v));}catch{}
+    for(const k of FALLBACK_CART_KEYS){ try{const v=localStorage.getItem(k); if(v) return normalize(JSON.parse(v));}catch{} }
     return [];
   }
-  function getCart(){ return readCartAny(); }
+  function getCart(){ return readCart(); }
   function setCart(items){
     localStorage.setItem(CART_KEY, JSON.stringify(normalize(items)));
     for(const k of FALLBACK_CART_KEYS) localStorage.removeItem(k);
     updateBadge();
   }
-  function updateBadge(){ const b=$("#cartCount"); if(!b) return; b.textContent=getCart().reduce((n,i)=>n+i.qty,0); }
-  function removeFromCart(id){ setCart(getCart().filter(i=>i.id!==id)); renderCart(); }
+  function updateBadge(){ const b=$("#cartCount"); if(b) b.textContent=getCart().reduce((n,i)=>n+i.qty,0); }
 
-  // ---------- Render ----------
+  // ——— Render ———
   function renderCart(){
-    const host=$("#cartContainer"); if(!host) return;
-    const cart=getCart(); host.innerHTML="";
-
+    const host=$("#cartContainer"); host.innerHTML="";
+    const cart=getCart();
     if(cart.length===0){
-      cons
+      const empty=document.createElement("div");
+      empty.className="card"; empty.textContent="Your cart is empty.";
+      host.appendChild(empty);
+    }else{
+      let total=0;
+      cart.forEach(i=>{
+        const p=PRODUCTS.find(x=>x.id===i.id)||{name:i.id,price:0,img:"https://picsum.photos/seed/placeholder/400/300",alt:"Item"};
+        const line=p.price*i.qty; total+=line;
+        const row=document.createElement("div");
+        row.className="card";
+        row.innerHTML=`
+          <div class="grid" style="grid-template-columns:80px 1fr auto; align-items:center">
+            <img class="thumb" src="${p.img}" alt="${p.alt}">
+            <div><strong>${p.name}</strong><br>Qty: ${i.qty} × ${fmt.format(p.price)}</div>
+            <div style="text-align:right"><div>${fmt.format(line)}</div></div>
+          </div>`;
+        host.appendChild(row);
+      });
+      const sum=document.createElement("div"); sum.className="card";
+      sum.innerHTML=`<div style="display:flex; justify-content:space-between; align-items:center"><strong>Total</strong><strong>${fmt.format(total)}</strong></div>`;
+      host.appendChild(sum);
+    }
+    updateBadge();
+  }
+
+  function renderCustom(){
+    const box=$("#customSummary");
+    try{
+      const data=JSON.parse(sessionStorage.getItem(CUSTOM_KEY));
+      if(!data){ box.innerHTML="<p class='help'>No custom order saved this session.</p>"; return; }
+      box.innerHTML=`<ul class="stack" style="margin:0; padding-left:1rem">
+        <li><strong>Size:</strong> ${data.size}</li>
+        <li><strong>Flavor:</strong> ${data.flavor}</li>
+        <li><strong>Frosting:</strong> ${data.frosting}</li>
+        <li><strong>Pickup Date:</strong> ${data.pickupDate}</li>
+        <li><strong>Notes:</strong> ${data.notes}</li>
+      </ul>`;
+    }catch{ box.innerHTML="<p class='help'>Could not load custom order.</p>"; }
+  }
+
+  // ——— Actions ———
+  $("#processOrder").addEventListener("click",()=>{
+    if(sessionStorage.getItem(ORDER_KEY)==="1"){ alert("Your order has already been processed. Thank you!"); return; }
+    const hasCart=getCart().length>0, hasCustom=!!sessionStorage.getItem(CUSTOM_KEY);
+    if(!hasCart && !hasCustom){ alert("Your cart is empty. Add items or save a custom order first."); return; }
+    sessionStorage.setItem(ORDER_KEY,"1");
+    setCart([]); sessionStorage.removeItem(CUSTOM_KEY);
+    renderCart(); renderCustom();
+    alert("Order received! We will contact you to confirm details.");
+  });
+  $("#clearCart").addEventListener("click",()=>{ if(confirm("Clear all items?")){ setCart([]); renderCart(); alert("Cart cleared!"); } });
+
+  // ——— BOOT: force items so you can SEE them immediately ———
+  (function boot(){
+    if(getCart().length===0){ setCart([{id:"cookie-chip",qty:1},{id:"cake-redvelvet",qty:2}]); }
+    renderCart(); renderCustom();
+  })();
+  </script>
+</body>
+</html>
+
 
